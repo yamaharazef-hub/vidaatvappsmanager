@@ -1,0 +1,8 @@
+{
+  "name": "VIDAA Launcher",
+  "short_name": "Launcher",
+  "start_url": "./",
+  "display": "fullscreen",
+  "background_color": "#0b0f1a",
+  "theme_color": "#0b0f1a"
+}

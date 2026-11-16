@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VIDAA Launcher</title>
+  <meta name="theme-color" content="#0b0f1a">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233b82f6'/%3E%3Cg fill='%23fff'%3E%3Crect x='12' y='12' width='17' height='17' rx='4'/%3E%3Crect x='35' y='12' width='17' height='17' rx='4'/%3E%3Crect x='12' y='35' width='17' height='17' rx='4'/%3E%3Crect x='35' y='35' width='17' height='17' rx='4'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- ===== Header ===== -->
+    <header class="header">
+      <div class="brand">
+        <span class="brand-logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="brand-name">VIDAA Launcher</span>
+      </div>
+      <nav class="tabs" id="tabs">
+        <button class="tab f" data-view="apps">Apps</button>
+        <button class="tab f" data-view="media">USB Media</button>
+        <button class="tab f" data-view="settings">Settings</button>
+      </nav>
+      <div class="clock" id="clock"></div>
+    </header>
+
+    <!-- ===== Apps view ===== -->
+    <main class="view" id="view-apps">
+      <div class="toolbar">
+        <h1 class="view-title" id="apps-title">My Apps</h1>
+        <div class="toolbar-actions">
+          <button class="btn f" id="btn-add">+ Add app</button>
+          <button class="btn f" id="btn-edit">Edit mode</button>
+        </div>
+      </div>
+      <div class="grid-wrap" id="grid-wrap">
+        <div class="grid" id="grid"></div>
+      </div>
+    </main>
+
+    <!-- ===== Media view ===== -->
+    <main class="view hidden" id="view-media">
+      <div class="toolbar">
+        <h1 class="view-title">USB &amp; Network Media</h1>
+        <div class="toolbar-actions">
+          <button class="btn primary f" id="btn-pick">Choose files from USB</button>
+          <button class="btn f" id="btn-clear-media">Clear list</button>
+        </div>
+      </div>
+      <input type="file" id="file-input" class="visually-hidden" multiple accept="video/*,audio/*,image/*,.mkv,.mp4,.ts,.avi,.mov,.webm,.mp3,.m4a,.aac,.flac,.wav,.ogg,.jpg,.jpeg,.png,.gif,.webp">
+      <div class="url-row">
+        <input type="url" class="input f" id="media-url" placeholder="Or paste a video / audio / image link (http://...)">
+        <button class="btn f" id="btn-play-url">Play link</button>
+      </div>
+      <div class="media-list" id="media-list"></div>
+      <p class="empty-note" id="media-empty">
+        No media yet. Plug a USB drive into the TV, then press <b>Choose files from USB</b>.<br>
+        Whether the file picker can see USB drives depends on your TV's firmware. If it doesn't, use the TV's built-in Media Player instead.
+      </p>
+    </main>
+
+    <!-- ===== Settings view ===== -->
+    <main class="view hidden" id="view-settings">
+      <div class="settings-scroll" id="settings-scroll">
+        <h1 class="view-title">Settings</h1>
+
+        <section class="set-group">
+          <h2>Behaviour</h2>
+          <div class="set-row">
+            <div class="set-label">Open apps in<small>"Same window": press BACK in the site to return here.</small></div>
+            <button class="btn f" id="set-open"></button>
+          </div>
+          <div class="set-row">
+            <div class="set-label">Show website icons<small>Loads small icons from Google's favicon service.</small></div>
+            <button class="btn f" id="set-icons"></button>
+          </div>
+          <div class="set-row">
+            <div class="set-label">Show clock</div>
+            <button class="btn f" id="set-clock"></button>
+          </div>
+        </section>
+
+        <section class="set-group">
+          <h2>Sync your app list</h2>
+          <div class="set-row">
+            <div class="set-label">Load from apps.json<small>Edit <code>apps.json</code> in the GitHub repo on your phone or PC, then press this on the TV.</small></div>
+            <button class="btn f" id="set-load-json">Load apps.json</button>
+          </div>
+          <div class="set-row column">
+            <div class="set-label">Import from a link<small>Any link to a JSON app list, e.g. a raw GitHub Gist URL.</small></div>
+            <div class="url-row">
+              <input type="url" class="input f" id="import-url" placeholder="https://gist.githubusercontent.com/.../apps.json">
+              <button class="btn f" id="set-import-url">Import</button>
+            </div>
+          </div>
+          <div class="set-row column">
+            <div class="set-label">Backup / restore (JSON)</div>
+            <textarea class="input textarea f" id="json-box" spellcheck="false" placeholder="Press 'Show backup' to see your current list, or paste a list here and press 'Restore pasted'."></textarea>
+            <div class="row-buttons">
+              <button class="btn f" id="set-export">Show backup</button>
+              <button class="btn f" id="set-import">Restore pasted</button>
+              <button class="btn danger f" id="set-reset">Reset to defaults</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="set-group f" tabindex="0" id="set-about">
+          <h2>About</h2>
+          <p class="about">
+            VIDAA Launcher is a remote-friendly home screen for <b>websites and web apps</b> on Hisense / Toshiba VIDAA TVs.
+            VIDAA is not Android, so Android apps (APK files) cannot be installed or run. For those, plug an Android TV / Google TV stick into an HDMI port.
+          </p>
+          <p class="about small">Remote keys: Arrows move · OK selects · BACK goes back · RED = app options · GREEN = add app · YELLOW = edit mode · BLUE = settings · 1–9 / 0 = quick-launch app 1–10.</p>
+        </section>
+      </div>
+    </main>
+
+    <!-- ===== Footer hint ===== -->
+    <footer class="hintbar" id="hintbar"></footer>
+  </div>
+
+  <!-- ===== Modals ===== -->
+  <div class="modal-backdrop hidden" id="modal-editor" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h2 id="editor-title">Add app</h2>
+      <label class="field">
+        <span>Name</span>
+        <input type="text" class="input f" id="ed-name" maxlength="40" placeholder="e.g. YouTube">
+      </label>
+      <label class="field">
+        <span>Website address</span>
+        <input type="url" class="input f" id="ed-url" placeholder="e.g. youtube.com/tv">
+      </label>
+      <label class="field">
+        <span>Icon image link (optional)</span>
+        <input type="url" class="input f" id="ed-icon" placeholder="https://.../icon.png">
+      </label>
+      <div class="field">
+        <span>Colour</span>
+        <div class="swatches" id="ed-swatches"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn primary f" id="ed-save">Save</button>
+        <button class="btn f" id="ed-cancel">Cancel</button>
+        <button class="btn danger f" id="ed-delete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="modal-actions" role="dialog" aria-modal="true">
+    <div class="modal small">
+      <h2 id="actions-title">App</h2>
+      <p class="modal-sub" id="actions-url"></p>
+      <div class="menu">
+        <button class="btn menu-item f" data-act="open">Open</button>
+        <button class="btn menu-item f" data-act="edit">Edit</button>
+        <button class="btn menu-item f" data-act="move">Move</button>
+        <button class="btn menu-item f" data-act="first">Move to first</button>
+        <button class="btn menu-item danger f" data-act="delete">Delete</button>
+        <button class="btn menu-item f" data-act="cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="modal-confirm" role="dialog" aria-modal="true">
+    <div class="modal small">
+      <h2 id="confirm-title">Are you sure?</h2>
+      <p class="modal-sub" id="confirm-msg"></p>
+      <div class="modal-actions">
+        <button class="btn danger f" id="confirm-yes">Yes</button>
+        <button class="btn f" id="confirm-no">No</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Media player ===== -->
+  <div class="player hidden" id="player">
+    <video id="player-video" playsinline></video>
+    <img id="player-image" class="hidden" alt="">
+    <div class="player-audio hidden" id="player-audio-art">&#9835;</div>
+    <div class="osd" id="osd">
+      <div class="osd-title" id="osd-title"></div>
+      <div class="osd-bar"><div class="osd-fill" id="osd-fill"></div></div>
+      <div class="osd-row">
+        <span id="osd-time">0:00 / 0:00</span>
+        <span class="osd-keys">OK play/pause · ◀ ▶ seek 10s · ▲ ▼ prev/next · BACK close</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+
+  <script src="js/defaults.js"></script>
+  <script src="js/spatial.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
